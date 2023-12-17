@@ -1,0 +1,74 @@
+{
+  "name": "ishowoff",
+  "displayName": "ishowoff",
+  "description": "Show off your coding sessions on Github live. Its like Discord RPC, but for Github",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "IShowOff",
+      "properties": {
+        "ishowoff.github.username": {
+          "type": "string",
+          "default": "parapsychic",
+          "markdownDescription": "Your username"
+        },
+        "ishowoff.github.actionsRepo": {
+          "type": "string",
+          "default": "ishowoff",
+          "markdownDescription": "Please fork [parapsychic/ishowoff](https://github.com/parapsychic/ishowoff) to your account and enter the name of the fork. If you left it on default, it should be ishowoff."
+        },
+        "ishowoff.github.token": {
+          "type": "string",
+          "default": "XXXXXXXX",
+          "markdownDescription": "Generate a Personal Access Token from Github. [See how](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens). Expiration date is recommended. Please note that I won't be responsible for keys being stolen, please keep it secure."
+        },
+        "ishowoff.formatting.theme": {
+          "type": "string",
+          "default": "dark",
+          "markdownDescription": "Choose between themes. dark/light by default. You can set each fonts and colors individually. [See how](https://github.com/parapsychic/ishowoff)."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "ishowoff.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "ishowoff.activatePresence",
+        "title": "Start ShowOff"
+      },
+      {
+        "command": "ishowoff.disablePresence",
+        "title": "Stop ShowOff"
+      }
+    ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "@octokit/core": "^5.0.2"
+  }
+}
