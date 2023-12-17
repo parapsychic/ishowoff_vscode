@@ -34,6 +34,7 @@ function activate(context) {
 		const token = configuration.get('github.token');
 		const username = configuration.get('github.username');
 		const repo = configuration.get('github.actionsRepo');
+		const interval = configuration.get('github.interval');
 		const theme = configuration.get('formatting.theme');
 
 		// register on config changed
@@ -43,15 +44,16 @@ function activate(context) {
 			const token = configuration.get('github.token');
 			const username = configuration.get('github.username');
 			const repo = configuration.get('github.actionsRepo');
+			const interval = configuration.get('github.interval');
 			const theme = configuration.get('formatting.theme');
 
-			if (checkConfig(token, username, repo, theme)) {
-				updateActivity(token, username, repo, theme);
+			if (checkConfig(token, username, repo, theme, interval)) {
+				updateActivity(token, username, repo, theme, interval);
 			}
 		})
 
-		if (checkConfig(token, username, repo, theme)) {
-			updateActivity(token, username, repo, theme);
+		if (checkConfig(token, username, repo, theme, interval)) {
+			updateActivity(token, username, repo, theme, interval);
 		}
 		else {
 			vscode.window.showInformationMessage('IShowOff requires configuration. Please set the token and other information.',
@@ -74,7 +76,7 @@ function activate(context) {
 // This method is called when your extension is deactivated
 function deactivate() { }
 
-function updateActivity(token, username, repo, theme) {
+function updateActivity(token, username, repo, theme, interval) {
 	const startTime = Math.floor(Date.now() / 1000);
 
 
@@ -82,10 +84,7 @@ function updateActivity(token, username, repo, theme) {
 		auth: token
 	});
 
-	vscode.window.showInformationMessage(`Starting timer...`);
 	setInterval(async () => {
-		vscode.window.showInformationMessage(`Updating session...`);
-
 		await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
 			owner: username,
 			repo: repo,
@@ -97,9 +96,7 @@ function updateActivity(token, username, repo, theme) {
 				'X-GitHub-Api-Version': '2022-11-28'
 			}
 		});
-
-		vscode.window.showInformationMessage(`Session Updated...`);
-	}, 60 * 1000);
+	}, interval * 60 * 1000);
 }
 function getFileType(activeEditor) {
 	const document = activeEditor ? activeEditor.document : vscode.workspace.activeTextEditor.document;
@@ -131,10 +128,11 @@ function getWorkspaceName() {
 	}
 }
 
-function checkConfig(token, username, repo, theme) {
+function checkConfig(token, username, repo, theme, interval) {
 	if (token == undefined || token == "XXXXXXXX" || token.trim() == ""
 		|| username == undefined || username.trim() == ""
 		|| repo == undefined || repo.trim() == ""
+		|| interval == undefined || interval < 1 
 		|| theme == undefined || theme.trim() == "") {
 		return false;
 	}

@@ -32,6 +32,11 @@
           "default": "XXXXXXXX",
           "markdownDescription": "Generate a Personal Access Token from Github. [See how](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens). Expiration date is recommended. Please note that I won't be responsible for keys being stolen, please keep it secure."
         },
+        "ishowoff.github.interval": {
+          "type": "number",
+          "default": 10,
+          "markdownDescription": "An API request to update your session will be sent in this interval (in minutes)."
+        },
         "ishowoff.formatting.theme": {
           "type": "string",
           "default": "dark",
