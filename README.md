@@ -1,65 +1,21 @@
-# ishowoff README
+# IShowOff for Visual Studio Code Extension
 
-This is the README for your extension "ishowoff". After writing up a brief description, we recommend including the following sections.
+The companion extension for [IShowOff](https://github.com/parapsychic/ishowoff).
 
-## Features
+This extension can automatically run the Github Action to update your session time like this:
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+<img src="screenshots/img.png" height="100px">
 
-For example if there is an image subfolder under your extension project workspace:
 
-\!\[feature X\]\(images/feature-x.png\)
+## Setup
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+1. Get a [Personal Access Token](https://github.com/settings/tokens/new). Please keep in mind that this token is equivalent to your password. Do not give it admin permissions. repo:write permissions are required. Anything below that is not required. Also, for extra safety, set an expiration date.
+2. Fork [IShowOff](https://github.com/parapsychic/ishowoff) and follow the instructions on that repo.
+3. Set the settings in VS Code. You should be prompted during the first run. Be sure to set the **Token** from last step, **username**, **forked repo name** from last step (usually, just ishowoff).
 
-## Requirements
+## Known issues:
+1. Editing config might trigger multiple timers and may send multiple rerun requests to github workflow. I'm working on a fix.
+2. You tell me. Open an issue.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
 
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+**Enjoy**
