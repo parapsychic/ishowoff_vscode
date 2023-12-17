@@ -4,7 +4,7 @@ The companion extension for [IShowOff](https://github.com/parapsychic/ishowoff).
 
 This extension can automatically run the Github Action to update your session time like this:
 
-<img src="screenshots/img.png" height="100px">
+<img src="screenshots/img.png" width="100%">
 
 
 ## Setup
