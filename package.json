@@ -41,14 +41,15 @@
           "type": "string",
           "default": "dark",
           "markdownDescription": "Choose between themes. dark/light by default. You can set each fonts and colors individually. [See how](https://github.com/parapsychic/ishowoff)."
+        },
+        "ishowoff.runs.customCommands": {
+          "type": "string",
+          "default": " ",
+          "markdownDescription": "These custom commands will be directly supplied while running the action. These commands are not checked for correctness. Please proceed at your own risk. See [here)(https://github.com/parapsychic/ishowoff_vscode/blob/main/README.md#custom-commands)"
         }
       }
     },
     "commands": [
-      {
-        "command": "ishowoff.helloWorld",
-        "title": "Hello World"
-      },
       {
         "command": "ishowoff.activatePresence",
         "title": "Start ShowOff"

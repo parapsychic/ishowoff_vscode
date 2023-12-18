@@ -36,30 +36,33 @@ function activate(context) {
 		const repo = configuration.get('github.actionsRepo');
 		const interval = configuration.get('github.interval');
 		const theme = configuration.get('formatting.theme');
+		const customCommands = configuration.get('runs.customCommands');
 
 		// register on config changed
-		vscode.workspace.onDidChangeConfiguration((_) => {
-			// update values
-			const configuration = vscode.workspace.getConfiguration('ishowoff');
-			const token = configuration.get('github.token');
-			const username = configuration.get('github.username');
-			const repo = configuration.get('github.actionsRepo');
-			const interval = configuration.get('github.interval');
-			const theme = configuration.get('formatting.theme');
+		vscode.workspace.onDidChangeConfiguration((event) => {
+			if (event.affectsConfiguration('ishowoff')) {
+				vscode.window.showInformationMessage('IShowOff detected changes in configuration. A reload is required.',
+					'Reload VS Code'
+				).then((value) => {
+					if (value == "Reload VS Code") {
+						vscode.commands.executeCommand('workbench.action.reloadWindow')
 
-			if (checkConfig(token, username, repo, theme, interval)) {
-				updateActivity(token, username, repo, theme, interval);
+					}
+				});
 			}
 		})
 
 		if (checkConfig(token, username, repo, theme, interval)) {
-			updateActivity(token, username, repo, theme, interval);
+			updateActivity(token, username, repo, theme, customCommands, interval);
 		}
 		else {
 			vscode.window.showInformationMessage('IShowOff requires configuration. Please set the token and other information.',
 				'Open Settings'
-			).then((_) =>
-				vscode.commands.executeCommand("workbench.action.openSettings", "ishowoff")
+			).then((value) => {
+				if (value == "Open Settings") {
+					vscode.commands.executeCommand("workbench.action.openSettings", "ishowoff")
+				}
+			}
 			);
 		}
 
@@ -76,7 +79,7 @@ function activate(context) {
 // This method is called when your extension is deactivated
 function deactivate() { }
 
-function updateActivity(token, username, repo, theme, interval) {
+function updateActivity(token, username, repo, theme, customCommands, interval) {
 	const startTime = Math.floor(Date.now() / 1000);
 
 
@@ -90,7 +93,7 @@ function updateActivity(token, username, repo, theme, interval) {
 			repo: repo,
 			event_type: 'update-from-vscode',
 			client_payload: {
-				arguments: `starttime=${startTime} theme=${theme} primary-text=${getWorkspaceName()} lang=${findFileType()} editor-text="Visual Studio Code"`
+				arguments: `starttime=${startTime} theme=${theme} primary-text=${getWorkspaceName()} lang=${findFileType()} editor-text="Visual Studio Code" ${customCommands}`
 			},
 			headers: {
 				'X-GitHub-Api-Version': '2022-11-28'
@@ -132,7 +135,7 @@ function checkConfig(token, username, repo, theme, interval) {
 	if (token == undefined || token == "XXXXXXXX" || token.trim() == ""
 		|| username == undefined || username.trim() == ""
 		|| repo == undefined || repo.trim() == ""
-		|| interval == undefined || interval < 1 
+		|| interval == undefined || interval < 1
 		|| theme == undefined || theme.trim() == "") {
 		return false;
 	}

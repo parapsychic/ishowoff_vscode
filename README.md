@@ -21,8 +21,9 @@ View full list of [arguments here](https://github.com/parapsychic/ishowoff). Som
 To run a entirely different command, use the [chaining operators](https://www.geeksforgeeks.org/chaining-commands-in-linux/) in Bash, assuming you did not change the actions to run on a different operating system.
 
 ## Known issues:
-1. Editing config might trigger multiple timers and may send multiple rerun requests to github workflow. I'm working on a fix.
-2. You tell me. Open an issue.
+1. Editing config might trigger multiple timers and may send multiple rerun requests to github workflow. I'm working on a fix. (fixed ig?)
+2. Opening different VSCode winddows/instances will trigger different timers and will keep on overwriting by calling the action on specified intervals. This is intended behaviour and can be stopped by calling ishowoff.disablePresence from the command palette on one of the instances.
+3. You tell me. Open an issue.
 
 
 **Enjoy**
