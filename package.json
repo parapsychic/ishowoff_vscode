@@ -14,6 +14,10 @@
     "onStartupFinished"
   ],
   "main": "./extension.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/parapsychic/ishowoff_vscode.git"
+  },
   "contributes": {
     "configuration": {
       "title": "IShowOff",
