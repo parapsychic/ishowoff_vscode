@@ -3,6 +3,7 @@
   "displayName": "ishowoff",
   "description": "Show off your coding sessions on your Github profile. Its like Discord RPC, but for Github",
   "icon": "images/icon.png",
+  "publisher": "parapsychic",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.85.0"
