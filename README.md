@@ -4,7 +4,7 @@ The companion extension for [IShowOff](https://github.com/parapsychic/ishowoff).
 
 This extension can automatically run the Github Action display your session time on your Github profile like this:
 
-<img src="screenshots/img.png" width="100%">
+<img src="images/img.png" width="100%">
 
 
 ## Setup
@@ -25,5 +25,7 @@ To run a entirely different command, use the [chaining operators](https://www.ge
 2. Opening different VSCode winddows/instances will trigger different timers and will keep on overwriting by calling the action on specified intervals. This is intended behaviour and can be stopped by calling ishowoff.disablePresence from the command palette on one of the instances.
 3. You tell me. Open an issue.
 
+
+Icon was made by Bing Chat. Please do let me know if it breaks any copyrights.
 
 **Enjoy**
