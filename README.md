@@ -9,9 +9,10 @@ This extension can automatically run the Github Action display your session time
 
 ## Setup
 
-1. Get a [Personal Access Token](https://github.com/settings/tokens/new). Please keep in mind that this token is equivalent to your password. Do not give it admin permissions. repo:write permissions are required. Anything below that is not required. Also, for extra safety, set an expiration date.
-2. Fork [IShowOff](https://github.com/parapsychic/ishowoff) and follow the instructions on that repo.
-3. Set the settings in VS Code. You should be prompted during the first run. Be sure to set the **Token** from last step, **username**, **forked repo name** from last step (usually, just ishowoff).
+1. Download the VS Code extension from the [marketplace](https://marketplace.visualstudio.com/items?itemName=parapsychic.ishowoff) or sideload this repo.
+2. Get a [Personal Access Token](https://github.com/settings/tokens/new). Please keep in mind that this token is equivalent to your password. Do not give it admin permissions. repo:write permissions are required. Anything below that is not required. Also, for extra safety, set an expiration date.
+3. Fork [IShowOff](https://github.com/parapsychic/ishowoff) and follow the instructions on that repo.
+4. Set the settings in VS Code. You should be prompted during the first run. Be sure to set the **Token** from last step, **username**, **forked repo name** from last step (usually, just ishowoff).
 
 ## Custom Commands
 If you want to supply additional arguments or run different commands after running the rust binary to create svg file, you can use the custom commands section.
