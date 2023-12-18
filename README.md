@@ -13,6 +13,13 @@ This extension can automatically run the Github Action display your session time
 2. Fork [IShowOff](https://github.com/parapsychic/ishowoff) and follow the instructions on that repo.
 3. Set the settings in VS Code. You should be prompted during the first run. Be sure to set the **Token** from last step, **username**, **forked repo name** from last step (usually, just ishowoff).
 
+## Custom Commands
+If you want to supply additional arguments or run different commands after running the rust binary to create svg file, you can use the custom commands section.
+
+View full list of [arguments here](https://github.com/parapsychic/ishowoff). Some of them are set by the other setting fields and might get overwritten.
+
+To run a entirely different command, use the [chaining operators](https://www.geeksforgeeks.org/chaining-commands-in-linux/) in Bash, assuming you did not change the actions to run on a different operating system.
+
 ## Known issues:
 1. Editing config might trigger multiple timers and may send multiple rerun requests to github workflow. I'm working on a fix.
 2. You tell me. Open an issue.
