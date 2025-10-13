@@ -4,7 +4,7 @@
   "description": "Show off your coding sessions on your Github profile. Its like Discord RPC, but for Github",
   "icon": "images/icon.png",
   "publisher": "parapsychic",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -26,17 +26,12 @@
         "ishowoff.github.username": {
           "type": "string",
           "default": "parapsychic",
-          "markdownDescription": "Your username"
+          "markdownDescription": "Override the automatically detected username for the Github Action. This is useful if you are working on a fork of the repository or if you want to use a custom version of the action. Format: `parapsychic`"
         },
         "ishowoff.github.actionsRepo": {
           "type": "string",
-          "default": "ishowoff",
-          "markdownDescription": "Please fork [parapsychic/ishowoff](https://github.com/parapsychic/ishowoff) to your account and enter the name of the fork. If you left it on default, it should be ishowoff."
-        },
-        "ishowoff.github.token": {
-          "type": "string",
-          "default": "XXXXXXXX",
-          "markdownDescription": "Generate a Personal Access Token from Github. [See how](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens). Expiration date is recommended. Please note that I won't be responsible for keys being stolen, please keep it secure."
+          "default": "",
+          "markdownDescription": "Override the automatically detected repository for the Github Action. This is useful if you are working on a fork of the repository or if you want to use a custom version of the action. Format: `ishowoff`"
         },
         "ishowoff.github.interval": {
           "type": "number",
@@ -51,7 +46,7 @@
         "ishowoff.runs.customCommands": {
           "type": "string",
           "default": " ",
-          "markdownDescription": "These custom commands will be directly supplied while running the action. These commands are not checked for correctness. Please proceed at your own risk. See [here)(https://github.com/parapsychic/ishowoff_vscode/blob/main/README.md#custom-commands)"
+          "markdownDescription": "These custom commands will be directly supplied while running the action. These commands are not checked for correctness. Please proceed at your own risk. See [here](https://github.com/parapsychic/ishowoff_vscode/blob/main/README.md#custom-commands)"
         }
       }
     },

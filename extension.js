@@ -1,151 +1,195 @@
-// The module 'vscode' contains the VS Code extensibility API
-
-// Import the module and reference it with the alias vscode in your code below
 const vscode = require('vscode');
 const path = require("path");
-const Octokit = require("@octokit/core").Octokit;
-
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+const fs = require('fs');
+const os = require('os');
+const { Octokit } = require("@octokit/core");
 
 /**
  * @param {vscode.ExtensionContext} context
  */
-function activate(context) {
+async function activate(context) {
+    console.log('IShowOff is now active!');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "ishowoff" is now active!');
+    const disposableHello = vscode.commands.registerCommand('ishowoff.helloWorld', () => {
+        vscode.window.showInformationMessage(`Hello from IShowOff! ${vscode.workspace.name || "No workspace"}`);
+    });
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('ishowoff.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
+    const disposableActivate = vscode.commands.registerCommand('ishowoff.activatePresence', async () => {
+        vscode.window.showInformationMessage('Activating GitHub ShowOff...');
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage(`Hello World from ishowoff! ${vscode.workspace.name}`);
-	});
+        let auth = await getGitHubAuth();
+        if (!auth) return;
 
-	let showOffActivate = vscode.commands.registerCommand('ishowoff.activatePresence', function () {
-		vscode.window.showInformationMessage('Github ShowOff Activated !');
+        const { token, username, octokit } = auth;
 
-		const configuration = vscode.workspace.getConfiguration('ishowoff');
-		const token = configuration.get('github.token');
-		const username = configuration.get('github.username');
-		const repo = configuration.get('github.actionsRepo');
-		const interval = configuration.get('github.interval');
-		const theme = configuration.get('formatting.theme');
-		const customCommands = configuration.get('runs.customCommands');
+        const configuration = vscode.workspace.getConfiguration('ishowoff');
+        let repo = configuration.get('github.actionsRepo');
+        let interval = configuration.get('github.interval') || 10;
+        let theme = configuration.get('formatting.theme') || "default";
+        let customCommands = configuration.get('runs.customCommands') || "";
 
-		// register on config changed
-		vscode.workspace.onDidChangeConfiguration((event) => {
-			if (event.affectsConfiguration('ishowoff')) {
-				vscode.window.showInformationMessage('IShowOff detected changes in configuration. A reload is required.',
-					'Reload VS Code'
-				).then((value) => {
-					if (value == "Reload VS Code") {
-						vscode.commands.executeCommand('workbench.action.reloadWindow')
+        // Check if user already has forked repo, else fork automatically
+        if (!repo){
+            // user has not overridden repo, check for fork
+            repo = await ensureForkExists(octokit, username, repo, configuration);
+        }
 
-					}
-				});
-			}
-		})
+        // React to configuration changes
+        vscode.workspace.onDidChangeConfiguration(event => {
+            if (event.affectsConfiguration('ishowoff')) {
+                vscode.window.showInformationMessage(
+                    'IShowOff configuration changed. Reload required.',
+                    'Reload VS Code'
+                ).then(val => {
+                    if (val === "Reload VS Code") vscode.commands.executeCommand('workbench.action.reloadWindow');
+                });
+            }
+        });
 
-		if (checkConfig(token, username, repo, theme, interval)) {
-			updateActivity(token, username, repo, theme, customCommands, interval);
-		}
-		else {
-			vscode.window.showInformationMessage('IShowOff requires configuration. Please set the token and other information.',
-				'Open Settings'
-			).then((value) => {
-				if (value == "Open Settings") {
-					vscode.commands.executeCommand("workbench.action.openSettings", "ishowoff")
-				}
-			}
-			);
-		}
+        if (repo) {
+            vscode.window.showInformationMessage(`IShowOff connected as @${username}`);
+            updateActivity(octokit, username, repo, theme, customCommands, interval);
+        } else {
+            vscode.window.showErrorMessage("Could not find or create the repository for IShowOff.");
+        }
+    });
 
-	})
+    const disposableDisable = vscode.commands.registerCommand('ishowoff.disablePresence', () => {
+        vscode.window.showInformationMessage('GitHub ShowOff Disabled.');
+    });
 
-	let showOffDisable = vscode.commands.registerCommand('ishowoff.disablePresence', function () {
-		vscode.window.showInformationMessage('Github ShowOff Disabled !');
-	})
-
-	vscode.commands.executeCommand('ishowoff.activatePresence')
-	context.subscriptions.push(disposable, showOffActivate, showOffDisable);
+    // Auto activate
+    vscode.commands.executeCommand('ishowoff.activatePresence');
+    context.subscriptions.push(disposableHello, disposableActivate, disposableDisable);
 }
 
-// This method is called when your extension is deactivated
 function deactivate() { }
 
-function updateActivity(token, username, repo, theme, customCommands, interval) {
-	const startTime = Math.floor(Date.now() / 1000);
+// === CORE FUNCTIONS === //
 
+/**
+ * Uses GitHub auth provider or falls back to manual token entry for Codium.
+ */
+async function getGitHubAuth() {
+    const githubAuthProvider = vscode.authentication?.getSession
+        ? 'github'
+        : null;
 
-	const octokit = new Octokit({
-		auth: token
-	});
+    try {
+        let session;
+        if (githubAuthProvider) {
+            try {
+                session = await vscode.authentication.getSession('github', ['repo', 'workflow'], { createIfNone: true });
+            } catch (err) {
+                console.warn("GitHub authentication not available, using fallback.");
+            }
+        }
 
-	setInterval(async () => {
-		await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
-			owner: username,
-			repo: repo,
-			event_type: 'update-from-vscode',
-			client_payload: {
-				arguments: `starttime=${startTime} theme=${theme} primary-text=${getWorkspaceName()} lang=${findFileType()} editor-text="Visual Studio Code" ${customCommands}`
-			},
-			headers: {
-				'X-GitHub-Api-Version': '2022-11-28'
-			}
-		});
-	}, interval * 60 * 1000);
+        if (!session) {
+            // fallback: ask for a personal access token
+            const token = await vscode.window.showInputBox({
+                prompt: 'Enter your GitHub Personal Access Token (repo + workflow scopes)',
+                ignoreFocusOut: true,
+                password: true
+            });
+            if (!token) {
+                vscode.window.showErrorMessage("GitHub token is required for IShowOff to work.");
+                return null;
+            }
+            const octokit = new Octokit({ auth: token });
+            const { data: user } = await octokit.request('/user');
+            return { token, username: user.login, octokit };
+        }
+
+        const octokit = new Octokit({ auth: session.accessToken });
+        const { data: user } = await octokit.request('/user');
+        return { token: session.accessToken, username: user.login, octokit };
+
+    } catch (err) {
+        vscode.window.showErrorMessage(`GitHub authentication failed: ${err.message}`);
+        return null;
+    }
 }
-function getFileType(activeEditor) {
-	const document = activeEditor ? activeEditor.document : vscode.workspace.activeTextEditor.document;
-	return document.languageId;
+
+/**
+ * Ensures the user has a fork of parapsychic/ishowoff, else prompts to fork.
+ */
+async function ensureForkExists(octokit, username, repo, configuration) {
+    try {
+        // Check if fork exists
+        const { data: forks } = await octokit.request('GET /repos/{owner}/{repo}/forks', {
+            owner: 'parapsychic',
+            repo: 'ishowoff'
+        });
+
+        const userFork = forks.find(f => f.owner.login === username);
+        if (userFork) {
+            repo = userFork.name;
+            await configuration.update('github.actionsRepo', repo, vscode.ConfigurationTarget.Global);
+            return repo;
+        }
+
+        // Prompt to fork
+        const choice = await vscode.window.showInformationMessage(
+            'You need your own fork of parapsychic/ishowoff to continue.',
+            'Fork Automatically',
+            'Cancel'
+        );
+
+        if (choice === 'Fork Automatically') {
+            const { data: forked } = await octokit.request('POST /repos/{owner}/{repo}/forks', {
+                owner: 'parapsychic',
+                repo: 'ishowoff'
+            });
+
+            vscode.window.showInformationMessage(`Fork created: ${forked.full_name}`);
+            repo = forked.name;
+            await configuration.update('github.actionsRepo', repo, vscode.ConfigurationTarget.Global);
+            await configuration.update('github.username', username, vscode.ConfigurationTarget.Global);
+            return repo;
+        }
+
+        return null;
+    } catch (err) {
+        vscode.window.showErrorMessage(`Error checking or creating fork: ${err.message}`);
+        return null;
+    }
 }
 
-function findFileType() {
-	// Get the file type of the currently active editor
-	const activeEditor = vscode.window.activeTextEditor;
-	if (activeEditor == undefined) return "none";
-
-	const fileType = getFileType(activeEditor);
-	console.log(`Current file type: ${fileType}`);
-	return fileType;
-
+/**
+ * Periodically updates GitHub repo dispatch event
+ */
+function updateActivity(octokit, username, repo, theme, customCommands, interval) {
+    const startTime = Math.floor(Date.now() / 1000);
+    setInterval(async () => {
+        try {
+            await octokit.request('POST /repos/{owner}/{repo}/dispatches', {
+                owner: username,
+                repo,
+                event_type: 'update-from-vscode',
+                client_payload: {
+                    arguments: `starttime=${startTime} theme=${theme} primary-text=${getWorkspaceName()} lang=${findFileType()} editor-text="VS Code" ${customCommands}`
+                },
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+        } catch (err) {
+            console.error(`IShowOff dispatch failed: ${err.message}`);
+        }
+    }, interval * 60 * 1000);
 }
 
 function getWorkspaceName() {
-	if (vscode.workspace.name) {
-		return vscode.workspace.name;
-	} else {
-		const activeEditor = vscode.window.activeTextEditor;
-		if (activeEditor) {
-			return path.basename(activeEditor.document.fileName);
-		}
-		else {
-			return "Idling";
-		}
-	}
+    if (vscode.workspace.name) return vscode.workspace.name;
+    const editor = vscode.window.activeTextEditor;
+    return editor ? path.basename(editor.document.fileName) : "Idling";
 }
 
-function checkConfig(token, username, repo, theme, interval) {
-	if (token == undefined || token == "XXXXXXXX" || token.trim() == ""
-		|| username == undefined || username.trim() == ""
-		|| repo == undefined || repo.trim() == ""
-		|| interval == undefined || interval < 1
-		|| theme == undefined || theme.trim() == "") {
-		return false;
-	}
-
-	return true;
-
+function findFileType() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return "none";
+    return editor.document.languageId;
 }
 
-
-module.exports = {
-	activate,
-	deactivate
-}
+module.exports = { activate, deactivate };
