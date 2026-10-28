@@ -168,7 +168,7 @@ function updateActivity(octokit, username, repo, theme, customCommands, interval
                 repo,
                 event_type: 'update-from-vscode',
                 client_payload: {
-                    arguments: `starttime=${startTime} theme=${theme} primary-text=${getWorkspaceName()} lang=${findFileType()} editor-text="VS Code" ${customCommands}`
+                    arguments: `starttime=${startTime} theme=${theme} primary-text="${getWorkspaceName()}" lang="${findFileType()}" editor-text="VS Code" ${customCommands}`
                 },
                 headers: {
                     'X-GitHub-Api-Version': '2022-11-28'
